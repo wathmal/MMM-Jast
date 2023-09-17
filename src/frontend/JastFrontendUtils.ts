@@ -52,11 +52,12 @@ export default class JastUtils {
   }
 
   static getStockChange(stock: StockResponse): number {
-    return stock.price?.regularMarketChange
+    // return stock.price?.regularMarketChange
+    return stock.price?.regularMarketPrice - stock.meta?.price
   }
 
   static getStockChangePercent(stock: StockResponse): number {
-    return stock.price?.regularMarketChangePercent
+    return ((stock.price?.regularMarketPrice - stock.meta?.price) / stock.price?.price) * 100
   }
 
   static getCurrentValue(stock: StockResponse): number {
@@ -64,7 +65,8 @@ export default class JastUtils {
   }
 
   static getStockChangeAsString(stock: StockResponse, config: Config): string {
-    console.log("Style", JastUtils.getChangeValueStyle(config))
+    console.log('Style', JastUtils.getChangeValueStyle(config))
+
     return JastUtils.getStockChange(stock).toLocaleString(
       config.locale,
       Object.assign(JastUtils.getChangeValueStyle(config), {
@@ -88,6 +90,18 @@ export default class JastUtils {
 
   static getStockName(stock: StockResponse): string {
     return stock.meta.name || stock.price.longName
+  }
+
+  static getStockSymbol(stock: StockResponse): string {
+    return stock.meta.symbol
+  }
+
+  static getStockQuantity(stock: StockResponse): number {
+    return stock.meta.quantity
+  }
+
+  static getStockAvgPrice(stock: StockResponse): string {
+    return `$${stock.meta.price.toFixed(2)}`
   }
 
   static getPortfolioValueAsString(portfolio: Portfolio, config: Config): string {
@@ -123,8 +137,7 @@ export default class JastUtils {
         const configStock = config.stocks?.find((current) => current.symbol === stock.meta?.symbol)
         if (configStock?.quantity) {
           const currentStockValue = stock.price?.regularMarketPrice * configStock.quantity
-          const lastStockValue =
-            (stock.price?.regularMarketPrice - stock.price?.regularMarketChange) * configStock.quantity
+          const lastStockValue = stock.meta?.price * configStock.quantity
           const existingCurrency = portfolio.find((growth) => growth.currency === stock.price.currency)
 
           if (existingCurrency) {
@@ -142,6 +155,9 @@ export default class JastUtils {
         Log.warn('There was a problem calculating the detpot growth', err)
       }
     }
+
+    console.log(stocks)
+    console.log(portfolio)
 
     return portfolio
   }
