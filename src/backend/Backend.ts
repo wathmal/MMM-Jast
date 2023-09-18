@@ -21,7 +21,6 @@ module.exports = NodeHelper.create({
     if (notification.includes('JAST_STOCKS_REQUEST')) {
       const identifier = notification.substring('JAST_STOCKS_REQUEST'.length + 1)
       let stocks = await JastBackendUtils.requestStocks(payload)
-
       stocks = stocks.filter((stock) =>
         sanityFields.every((item) => {
           if (Object.prototype.hasOwnProperty.call(stock.price, item)) {

@@ -7,5 +7,6 @@ export type StockResponse = {
     name: string
     quantity?: number
     hidden?: boolean
+    price?: number
   }
 }
